@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"strings"
 	"fmt"
 	"os"
 	"sync"
@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	content    = pflag.StringP("content", "", "", "原始镜像，格式为：{ \"platform\": \"\", \"hub-mirror\": [] }")
+	content    = pflag.StringP("content", "", "", "原始镜像，source|platform")
 	maxContent = pflag.IntP("maxContent", "", 11, "原始镜像个数限制")
 	repository = pflag.StringP("repository", "", "", "推送仓库地址，为空默认为 hub.docker.com")
 	username   = pflag.StringP("username", "", "", "仓库用户名")
@@ -23,23 +23,26 @@ var (
 
 func main() {
 	pflag.Parse()
+	var platform string = ""
+	var source string
 
-	fmt.Println("验证原始镜像内容")
-	var hubMirrors struct {
-		Content  []string `json:"hub-mirror"`
-		Platform string   `json:"platform"`
+
+	lines := strings.Split(*content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			index := strings.Index(source, "|")
+			if index >= 0 {
+				platform = strings.TrimSpace(source[index+1:])
+				source = strings.TrimSpace(source[:index])
+			} else {
+				source = line
+			}
+			break
+		}
 	}
 
-	err := json.Unmarshal([]byte(*content), &hubMirrors)
-	if err != nil {
-		panic(err)
-	}
-
-	if len(hubMirrors.Content) > *maxContent {
-		panic("提交的原始镜像个数超出了最大限制")
-	}
-
-	fmt.Printf("mirrors: %+v, platform: %+v\n", hubMirrors.Content, hubMirrors.Platform)
+	fmt.Printf("mirrors: %s, platform: %s\n", source, platform)
 
 	fmt.Println("初始化 Docker 客户端")
 	cli, err := pkg.NewCli(context.Background(), *repository, *username, *password, os.Stdout)
@@ -48,31 +51,21 @@ func main() {
 	}
 
 	outputs := make([]*pkg.Output, 0)
-	mu := sync.Mutex{}
 	wg := sync.WaitGroup{}
 
-	for _, source := range hubMirrors.Content {
-		source := source
 
-		if source == "" {
-			continue
-		}
-		fmt.Println("开始转换镜像", source)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	fmt.Println("开始转换镜像", source)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 
-			output, err := cli.PullTagPushImage(context.Background(), source, hubMirrors.Platform)
-			if err != nil {
-				fmt.Println(source, "转换异常: ", err)
-				return
-			}
-
-			mu.Lock()
-			defer mu.Unlock()
+		output, err := cli.PullTagPushImage(context.Background(), source, platform)
+		if err != nil {
+			fmt.Println(source, "转换异常: ", err)
+		} else {
 			outputs = append(outputs, output)
-		}()
-	}
+		}
+	}()
 
 	wg.Wait()
 
