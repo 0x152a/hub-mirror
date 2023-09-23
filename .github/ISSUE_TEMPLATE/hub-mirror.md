@@ -5,6 +5,4 @@ title: ""
 labels: ["hub-mirror"]
 ---
 
-ghcr.io/project-osrm/osrm-backend:v5.27.1
-
-> 第一个非空白行写 原始镜像 或 镜像|平台，自动去除两侧空白字符，其余行均会被忽略
+> 标题为 原始镜像 或 镜像|平台，自动去除两侧空白字符，body中所有内容均会被忽略
