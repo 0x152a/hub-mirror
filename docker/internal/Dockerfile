@@ -10,5 +10,5 @@ RUN pnpm install
 
 ENV LISTEN_ADDRESS=0.0.0.0
 ENV PORT=80
-
+RUN pnpm build
 CMD pnpm start
