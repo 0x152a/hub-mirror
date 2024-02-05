@@ -1,9 +1,9 @@
-REPO_NAME="tldraw"
-TAG_NAME="v2.0.0-beta.2"
+REPO_NAME="geogebra"
+TAG_NAME="5.2.823.0"
 
-git clone https://github.com/tldraw/tldraw.git ./internal/app
+git clone https://github.com/geogebra/geogebra ./internal/app
 cd ./internal/app 
-git checkout v2.0.0-beta.2
+git checkout "$TAG_NAME"
 cd ../..
 
 docker build -t "0x152a/$REPO_NAME:$TAG_NAME" ./internal
