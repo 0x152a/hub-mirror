@@ -1,7 +1,7 @@
 REPO_NAME="geogebra"
 TAG_NAME="5.2.823.0"
 
-git clone https://github.com/geogebra/geogebra ./internal/app
+git clone https://github.com/geogebra/geogebra ./internal/app --depth=10
 cd ./internal/app 
 git checkout "$TAG_NAME"
 cd ../..

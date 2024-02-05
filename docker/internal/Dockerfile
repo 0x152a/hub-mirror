@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-alpine
+FROM amazoncorretto:11-alpine-jdk
 
 COPY ./app /app
 WORKDIR /app
