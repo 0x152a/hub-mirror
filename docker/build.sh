@@ -1,9 +1,9 @@
-REPO_NAME="geogebra"
-TAG_NAME="5.2.823.0"
+REPO_NAME="curlconverter.github.io"
+TAG_NAME="latest"
 
-git clone https://github.com/geogebra/geogebra ./internal/app --depth=10
+git clone https://github.com/curlconverter/curlconverter.github.io.git ./internal/app
 cd ./internal/app 
-git checkout "$TAG_NAME"
+# git checkout "$TAG_NAME"
 cd ../..
 
 docker build -t "0x152a/$REPO_NAME:$TAG_NAME" ./internal

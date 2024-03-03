@@ -1,8 +1,7 @@
-FROM amazoncorretto:11-alpine-jdk
+FROM node:20
 
 COPY ./app /app
 WORKDIR /app
-RUN cd /app && ./gradlew :web:build
+RUN cd /app && npm i && npm run build
 
-EXPOSE 8888
-CMD ["./gradlew", ":web:run", "-Pgbind=0.0.0.0"]
+CMD ["npm", "start"]
